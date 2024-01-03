@@ -11,29 +11,18 @@ final class MovieQuizViewController:
     
     // переменная с индексом текущего вопроса, начальное значение 0
     private var currentQuestionIndex = 0
+    
     // переменная со счётчиком правильных ответов, начальное значение закономерно 0
     private var correctAnswers = 0
     
-    //модель вопроса
-    private struct QuizQuestion {
-        let image: String
-        let text: String
-        let correctAnswer: Bool
-    }
+    //общее количество вопросов для квиза
+    private let questionsAmount: Int = 10
     
-    // вью модель для состояния "Вопрос показан"
-    private struct QuizStepViewModel {
-        let image: UIImage
-        let question: String
-        let questionNumber: String
-    }
+    //фабрика вопросов - rонтроллер будет обращаться за вопросами к ней
+    private var questionFactory: QuestionFactory = QuestionFactory()
     
-    // вью модель для состояния "Результат квиза показан"
-    private struct QuizResultViewModel {
-      let title: String
-      let text: String
-      let buttonText: String
-    }
+    //вопрос, который видит пользователь
+    private var currentQuestion: QuizQuestion?
     
     //тема статус бара
     override var preferredStatusBarStyle: UIStatusBarStyle{
@@ -42,13 +31,17 @@ final class MovieQuizViewController:
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        showQuizStep(quiz: convert(model: questions[currentQuestionIndex]))
+        if let firstQuestion = questionFactory.requestNextQuestion() {
+            currentQuestion = firstQuestion
+            let viewModel = convert(model: firstQuestion)
+            showQuizStep(quiz: viewModel)
+        }
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
         yesButton.isEnabled = false
         noButton.isEnabled = false
-        let currentQuestion = questions[currentQuestionIndex]
+        guard let currentQuestion = currentQuestion else { return }
         let myAnswer = false
         checkAnswerCorrectness(isCorrect: myAnswer == currentQuestion.correctAnswer)
     }
@@ -56,7 +49,7 @@ final class MovieQuizViewController:
     @IBAction private func yesButtonClicked(_ sender: Any) {
         yesButton.isEnabled = false
         noButton.isEnabled = false
-        let currentQuestion = questions[currentQuestionIndex]
+        guard let currentQuestion = currentQuestion else { return }
         let myAnswer = true
         checkAnswerCorrectness(isCorrect: myAnswer == currentQuestion.correctAnswer)
     }
@@ -66,7 +59,7 @@ final class MovieQuizViewController:
         let questionStep = QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
             question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)")
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
         return questionStep
     }
     
@@ -97,43 +90,49 @@ final class MovieQuizViewController:
     
     // приватный метод, который содержит логику перехода в один из сценариев
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == questions.count - 1 {
+        if currentQuestionIndex == questionsAmount - 1 {
             let result = QuizResultViewModel(
                 title: "Этот раунд окончен!",
-                text: "Ваш результат: \(correctAnswers)/\(questions.count)",
+                text: "Ваш результат: \(correctAnswers)/\(questionsAmount)",
                 buttonText: "Сыграть еще раз")
             showResultAlert(quiz: result)
         }else{
             currentQuestionIndex += 1
-            let nextQuestion = questions[currentQuestionIndex]
-            showQuizStep(quiz: convert(model: nextQuestion))
-        }
-        yesButton.isEnabled = true
-        noButton.isEnabled = true
-    }
-    
-    //метод, который показывает финальный алерт = результат квиза
-    private func showResultAlert(quiz result: QuizResultViewModel) {
-        let alert = UIAlertController(
-            title: result.title,
-            message: result.text,
-            preferredStyle: .alert)
-
-        let action = UIAlertAction(title: result.buttonText, style: .cancel) { [weak self] _ in
-            guard let self = self else {return}
+            if let nextQuestion = questionFactory.requestNextQuestion(){
+                currentQuestion = nextQuestion
+                let viewModel = convert(model: nextQuestion)
+                showQuizStep(quiz: viewModel)
+            }
             
-            self.currentQuestionIndex = 0
-            // сбрасываем переменную с количеством правильных ответов
-            self.correctAnswers = 0
-
-            // заново показываем первый вопрос
-            let firstQuestion = self.questions[self.currentQuestionIndex]
-            let viewModel = self.convert(model: firstQuestion)
-            self.showQuizStep(quiz: viewModel)
+            yesButton.isEnabled = true
+            noButton.isEnabled = true
         }
-
-        alert.addAction(action)
-
-        self.present(alert, animated: true, completion: nil)
     }
-}
+        //метод, который показывает финальный алерт = результат квиза
+        private func showResultAlert(quiz result: QuizResultViewModel) {
+            let alert = UIAlertController(
+                title: result.title,
+                message: result.text,
+                preferredStyle: .alert)
+            
+            let action = UIAlertAction(title: result.buttonText, style: .cancel) { [weak self] _ in
+                guard let self = self else {return}
+                
+                self.currentQuestionIndex = 0
+                // сбрасываем переменную с количеством правильных ответов
+                self.correctAnswers = 0
+                
+                // заново показываем первый вопрос
+                if let firstQuestion = self.questionFactory.requestNextQuestion(){
+                    self.currentQuestion = firstQuestion
+                    let viewModel = self.convert(model: firstQuestion)
+                    
+                    self.showQuizStep(quiz: viewModel)
+                }
+            }
+            
+            alert.addAction(action)
+            
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
