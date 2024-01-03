@@ -19,7 +19,7 @@ final class MovieQuizViewController:
     private let questionsAmount: Int = 10
     
     //фабрика вопросов - rонтроллер будет обращаться за вопросами к ней
-    private var questionFactory: QuestionFactory = QuestionFactory()
+    private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
     
     //вопрос, который видит пользователь
     private var currentQuestion: QuizQuestion?

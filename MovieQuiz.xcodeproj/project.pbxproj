@@ -20,6 +20,7 @@
 		D83232C82B4590CB00FE6F7A /* QuizStepViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83232C72B4590CB00FE6F7A /* QuizStepViewModel.swift */; };
 		D83232CA2B4590DF00FE6F7A /* QuizResultsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83232C92B4590DF00FE6F7A /* QuizResultsViewModel.swift */; };
 		D83232CC2B4590FA00FE6F7A /* QuizQuestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83232CB2B4590FA00FE6F7A /* QuizQuestion.swift */; };
+		D83232CE2B459AA800FE6F7A /* QuestionFactoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83232CD2B459AA800FE6F7A /* QuestionFactoryProtocol.swift */; };
 		D855E3DE2AA47D6200206301 /* YS Display-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D855E3DC2AA47D6200206301 /* YS Display-Bold.ttf */; };
 		D855E3DF2AA47D6200206301 /* YS Display-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D855E3DD2AA47D6200206301 /* YS Display-Medium.ttf */; };
 /* End PBXBuildFile section */
@@ -40,6 +41,7 @@
 		D83232C72B4590CB00FE6F7A /* QuizStepViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizStepViewModel.swift; sourceTree = "<group>"; };
 		D83232C92B4590DF00FE6F7A /* QuizResultsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizResultsViewModel.swift; sourceTree = "<group>"; };
 		D83232CB2B4590FA00FE6F7A /* QuizQuestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizQuestion.swift; sourceTree = "<group>"; };
+		D83232CD2B459AA800FE6F7A /* QuestionFactoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionFactoryProtocol.swift; sourceTree = "<group>"; };
 		D855E3DC2AA47D6200206301 /* YS Display-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Bold.ttf"; sourceTree = "<group>"; };
 		D855E3DD2AA47D6200206301 /* YS Display-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "YS Display-Medium.ttf"; path = "../../../MovieQuizFonts/YS Display-Medium.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -120,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				D83232C42B458F5900FE6F7A /* QuestionFactory.swift */,
+				D83232CD2B459AA800FE6F7A /* QuestionFactoryProtocol.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -210,6 +213,7 @@
 			files = (
 				AD5EE5DE284D7887003966EF /* UIColor+Extensions.swift in Sources */,
 				AD7AFA552836189F00399704 /* Array+Extensions.swift in Sources */,
+				D83232CE2B459AA800FE6F7A /* QuestionFactoryProtocol.swift in Sources */,
 				AD1ABAB62831907B00B3E448 /* MovieQuizViewController.swift in Sources */,
 				D83232C82B4590CB00FE6F7A /* QuizStepViewModel.swift in Sources */,
 				D83232CC2B4590FA00FE6F7A /* QuizQuestion.swift in Sources */,
