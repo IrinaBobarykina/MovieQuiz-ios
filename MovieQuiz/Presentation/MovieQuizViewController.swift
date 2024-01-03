@@ -1,7 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController:
-    UIViewController {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private weak var imageView: UIImageView!
@@ -11,18 +10,16 @@ final class MovieQuizViewController:
     
     // переменная с индексом текущего вопроса, начальное значение 0
     private var currentQuestionIndex = 0
-    
     // переменная со счётчиком правильных ответов, начальное значение закономерно 0
     private var correctAnswers = 0
     
     //общее количество вопросов для квиза
     private let questionsAmount: Int = 10
-    
-    //фабрика вопросов - rонтроллер будет обращаться за вопросами к ней
-    private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
-    
     //вопрос, который видит пользователь
     private var currentQuestion: QuizQuestion?
+    
+    //фабрика вопросов - rонтроллер будет обращаться за вопросами к ней
+    private var questionFactory: QuestionFactoryProtocol?
     
     //тема статус бара
     override var preferredStatusBarStyle: UIStatusBarStyle{
@@ -31,10 +28,20 @@ final class MovieQuizViewController:
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let firstQuestion = questionFactory.requestNextQuestion() {
-            currentQuestion = firstQuestion
-            let viewModel = convert(model: firstQuestion)
-            showQuizStep(quiz: viewModel)
+        questionFactory = QuestionFactory(delegate:self)
+        questionFactory?.requestNextQuestion()
+    }
+     
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        // проверка, что вопрос не nil
+        guard let question = question else {
+            return
+        }
+
+        currentQuestion = question
+        let viewModel = convert(model: question)
+        DispatchQueue.main.async { [weak self] in
+            self?.showQuizStep(quiz: viewModel)
         }
     }
     
@@ -98,11 +105,8 @@ final class MovieQuizViewController:
             showResultAlert(quiz: result)
         }else{
             currentQuestionIndex += 1
-            if let nextQuestion = questionFactory.requestNextQuestion(){
-                currentQuestion = nextQuestion
-                let viewModel = convert(model: nextQuestion)
-                showQuizStep(quiz: viewModel)
-            }
+            questionFactory?.requestNextQuestion()
+
             
             yesButton.isEnabled = true
             noButton.isEnabled = true
@@ -123,12 +127,8 @@ final class MovieQuizViewController:
                 self.correctAnswers = 0
                 
                 // заново показываем первый вопрос
-                if let firstQuestion = self.questionFactory.requestNextQuestion(){
-                    self.currentQuestion = firstQuestion
-                    let viewModel = self.convert(model: firstQuestion)
-                    
-                    self.showQuizStep(quiz: viewModel)
-                }
+                self.questionFactory?.requestNextQuestion()
+
             }
             
             alert.addAction(action)
