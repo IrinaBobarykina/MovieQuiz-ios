@@ -20,7 +20,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     //фабрика вопросов - rонтроллер будет обращаться за вопросами к ней
     private var questionFactory: QuestionFactoryProtocol?
-    
+    private var alertPresenter: AlertPresenterDelegate?
+    private var statisticService: StatisticService?
+
+
     //тема статус бара
     override var preferredStatusBarStyle: UIStatusBarStyle{
         return .lightContent
@@ -29,6 +32,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         questionFactory = QuestionFactory(delegate:self)
+        alertPresenter = AlertPresenter(viewController: self)
+        statisticService = StatisticServiceImplementation()
         questionFactory?.requestNextQuestion()
     }
      
@@ -97,42 +102,63 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // приватный метод, который содержит логику перехода в один из сценариев
     private func showNextQuestionOrResults() {
+        
+        yesButton.isEnabled = true
+        noButton.isEnabled = true
+        
         if currentQuestionIndex == questionsAmount - 1 {
             let result = QuizResultViewModel(
                 title: "Этот раунд окончен!",
                 text: "Ваш результат: \(correctAnswers)/\(questionsAmount)",
                 buttonText: "Сыграть еще раз")
-            showResultAlert(quiz: result)
+            
+            didGameFinished(quiz: result)
+            
         }else{
             currentQuestionIndex += 1
             questionFactory?.requestNextQuestion()
 
-            
-            yesButton.isEnabled = true
-            noButton.isEnabled = true
         }
     }
-        //метод, который показывает финальный алерт = результат квиза
-        private func showResultAlert(quiz result: QuizResultViewModel) {
-            let alert = UIAlertController(
-                title: result.title,
-                message: result.text,
-                preferredStyle: .alert)
-            
-            let action = UIAlertAction(title: result.buttonText, style: .cancel) { [weak self] _ in
-                guard let self = self else {return}
-                
-                self.currentQuestionIndex = 0
-                // сбрасываем переменную с количеством правильных ответов
-                self.correctAnswers = 0
-                
-                // заново показываем первый вопрос
-                self.questionFactory?.requestNextQuestion()
+    
+    private func getCurrentDate (date: Date) -> String {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd.MM.yy hh:mm"
+            let dateFormatted = dateFormatter.string(from: date)
+            return dateFormatted
+        }
 
+    private func makeResultMessage() -> String {
+            guard let statisticService = statisticService else {
+                assertionFailure("Error. Can't get statisticService")
+                return ""
             }
+        
+        let date = getCurrentDate(date: statisticService.bestGame.date)
+                
+                let resultMessage = [
+                    "Ваш результат: \(correctAnswers)/10",
+                    "Количество сыгранных квизов: \(statisticService.gamesCount)",
+                    "Рекорд \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(date))",
+                    "Средняя точность \(String(format: "%.2f",statisticService.totalAccuracy))%"].joined(separator: "\n")
+                
+                return resultMessage
+            }
+    
+    private func didGameFinished(quiz result: QuizResultViewModel) {
+            statisticService?.store(correct: correctAnswers, total: questionsAmount)
             
-            alert.addAction(action)
+            let alertModel = AlertModel(
+                title: result.title,
+                message: makeResultMessage(),
+                buttonText: result.buttonText,
+                completion: {
+                    self.currentQuestionIndex = 0
+                    self.correctAnswers = 0
+                    self.questionFactory?.requestNextQuestion()
+                })
             
-            self.present(alert, animated: true, completion: nil)
+            alertPresenter?.showResultAlert(alertModel: alertModel)
         }
-    }
+        
+}
