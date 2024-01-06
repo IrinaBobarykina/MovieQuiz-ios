@@ -32,10 +32,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        questionFactory = QuestionFactory(delegate:self)
+       
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter = AlertPresenter(viewController: self)
         statisticService = StatisticServiceImplementation()
-        questionFactory?.requestNextQuestion()
+
+        showLoadingIndicator()
+        questionFactory?.loadData()
     }
     
     //показываем индикатор загрузки
@@ -80,6 +83,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true // скрываем индикатор загрузки
+        questionFactory?.requestNextQuestion()
+    }
+
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription) // возьмём в качестве сообщения описание ошибки
+    }
+    
     @IBAction private func noButtonClicked(_ sender: Any) {
         yesButton.isEnabled = false
         noButton.isEnabled = false
@@ -99,7 +111,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     //преобразуем модель вопроса, в те данные, которые надо показать на экране приложения в состояни «Вопрос задан»
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
         return questionStep
