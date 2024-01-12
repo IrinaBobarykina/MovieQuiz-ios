@@ -9,21 +9,18 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private weak var yesButton: UIButton!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
-    // переменная с индексом текущего вопроса, начальное значение 0
-    private var currentQuestionIndex = 0
     // переменная со счётчиком правильных ответов, начальное значение закономерно 0
     private var correctAnswers = 0
     
-    //общее количество вопросов для квиза
-    private let questionsAmount: Int = 10
     //вопрос, который видит пользователь
     private var currentQuestion: QuizQuestion?
     
+    private let presenter = MovieQuizPresenter()
+
     //фабрика вопросов - rонтроллер будет обращаться за вопросами к ней
     private var questionFactory: QuestionFactoryProtocol?
     private var alertPresenter: AlertPresenterDelegate?
     private var statisticService: StatisticService?
-
 
     //тема статус бара
     override var preferredStatusBarStyle: UIStatusBarStyle{
@@ -61,9 +58,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                buttonText: "Попробовать еще раз") { [weak self] in
             guard let self = self else { return }
             
-            self.currentQuestionIndex = 0
+            self.presenter.resetQuestionIndex()
             self.correctAnswers = 0
-            
             self.questionFactory?.requestNextQuestion()
         }
         
@@ -71,13 +67,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
+        
         // проверка, что вопрос не nil
         guard let question = question else {
             return
         }
 
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.showQuizStep(quiz: viewModel)
         }
@@ -106,15 +103,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         guard let currentQuestion = currentQuestion else { return }
         let myAnswer = true
         checkAnswerCorrectness(isCorrect: myAnswer == currentQuestion.correctAnswer)
-    }
-    
-    //преобразуем модель вопроса, в те данные, которые надо показать на экране приложения в состояни «Вопрос задан»
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-        return questionStep
     }
     
     //метод, который будет брать данные из вью модели вопроса и отрисовывать их на экране
@@ -148,16 +136,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         yesButton.isEnabled = true
         noButton.isEnabled = true
         
-        if currentQuestionIndex == questionsAmount - 1 {
+        if presenter.isLastQuestion() {
             let result = QuizResultViewModel(
                 title: "Этот раунд окончен!",
-                text: "Ваш результат: \(correctAnswers)/\(questionsAmount)",
+                text: "Ваш результат: \(correctAnswers)/\(presenter.questionsAmount)",
                 buttonText: "Сыграть еще раз")
             
             didGameFinished(quiz: result)
             
         }else{
-            currentQuestionIndex += 1
+            presenter.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
 
         }
@@ -188,14 +176,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             }
     
     private func didGameFinished(quiz result: QuizResultViewModel) {
-            statisticService?.store(correct: correctAnswers, total: questionsAmount)
+        statisticService?.store(correct: correctAnswers, total: presenter.questionsAmount)
             
             let alertModel = AlertModel(
                 title: result.title,
                 message: makeResultMessage(),
                 buttonText: result.buttonText,
                 completion: {
-                    self.currentQuestionIndex = 0
+                    self.presenter.resetQuestionIndex()
                     self.correctAnswers = 0
                     self.questionFactory?.requestNextQuestion()
                 })

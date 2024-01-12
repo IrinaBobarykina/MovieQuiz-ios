@@ -16,6 +16,7 @@
 		AD5EE5DE284D7887003966EF /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5EE5DD284D7887003966EF /* UIColor+Extensions.swift */; };
 		AD77F5742857F8810062FB14 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD77F5732857F8810062FB14 /* Date+Extensions.swift */; };
 		AD7AFA552836189F00399704 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7AFA542836189F00399704 /* Array+Extensions.swift */; };
+		D80889BE2B5183D600C0E889 /* MovieQuizPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80889BD2B5183D600C0E889 /* MovieQuizPresenter.swift */; };
 		D815CFB62B49D14000FAA13B /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815CFB52B49D14000FAA13B /* NetworkClient.swift */; };
 		D815CFB82B49D2A000FAA13B /* MostPopularMovies.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815CFB72B49D2A000FAA13B /* MostPopularMovies.swift */; };
 		D815CFBA2B49D30500FAA13B /* MoviesLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815CFB92B49D30500FAA13B /* MoviesLoader.swift */; };
@@ -66,6 +67,7 @@
 		AD5EE5DD284D7887003966EF /* UIColor+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		AD77F5732857F8810062FB14 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
 		AD7AFA542836189F00399704 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
+		D80889BD2B5183D600C0E889 /* MovieQuizPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieQuizPresenter.swift; sourceTree = "<group>"; };
 		D815CFB52B49D14000FAA13B /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
 		D815CFB72B49D2A000FAA13B /* MostPopularMovies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MostPopularMovies.swift; sourceTree = "<group>"; };
 		D815CFB92B49D30500FAA13B /* MoviesLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesLoader.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				D83232D32B47152900FE6F7A /* AlertPresenter.swift */,
 				AD1ABAB52831907B00B3E448 /* MovieQuizViewController.swift */,
 				AD1ABAB72831907B00B3E448 /* Main.storyboard */,
+				D80889BD2B5183D600C0E889 /* MovieQuizPresenter.swift */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -371,6 +374,7 @@
 				D83232D02B45B33400FE6F7A /* QuestionFactoryDelegate.swift in Sources */,
 				AD1ABAB62831907B00B3E448 /* MovieQuizViewController.swift in Sources */,
 				D83232C82B4590CB00FE6F7A /* QuizStepViewModel.swift in Sources */,
+				D80889BE2B5183D600C0E889 /* MovieQuizPresenter.swift in Sources */,
 				D83232CC2B4590FA00FE6F7A /* QuizQuestion.swift in Sources */,
 				D83232C52B458F5900FE6F7A /* QuestionFactory.swift in Sources */,
 				AD77F5742857F8810062FB14 /* Date+Extensions.swift in Sources */,
